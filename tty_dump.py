@@ -31,17 +31,16 @@
 import serial, sys, getopt
 
 # Dead simple dumper script
-SIZE = 32768
-
 def usage():
-	print 'tty_dump.py -t <tty name> -o <output file>'
+	print 'tty_dump.py -t <tty name> -o <output file> -s <eprom size>'
 	sys.exit(2)
 	
 def main(argv):
+	eprom_size = 0
 	tty_name = ''
 	out_name = ''
 	try:
-		opts, args = getopt.getopt(argv,"ht:o:",["tty=","outfile="])
+		opts, args = getopt.getopt(argv,"ht:o:s:",["tty=","outfile=","size="])
 	except getopt.GetoptError:
 		usage()
 	for opt, arg in opts:
@@ -51,6 +50,8 @@ def main(argv):
 			tty_name = arg
 		elif opt in ("-o", "--outfile"):
 			out_name = arg
+		elif opt in ("-s", "--size"):
+			eprom_size = int(arg)
 	if tty_name and out_name:
 		with serial.Serial(tty_name, 115200) as tty_handle:
 			with open(out_name,'w') as out_handle:
@@ -59,11 +60,11 @@ def main(argv):
 				tty_handle.write('c');
 		
 				# Check leader sequence
-				print "Dump starting"
+				print "Dump starting, capturing %u bytes" % (eprom_size)
 				leader = tty_handle.read(4)
 				if leader == 'ijsf':
 					c = 0
-					while c < SIZE:
+					while c < eprom_size:
 						b = tty_handle.read(1)
 						out_handle.write(b)
 						c = c + 1
