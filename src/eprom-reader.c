@@ -421,7 +421,8 @@ static inline void eprom_address_wr(U16 addr)
   // write address to P0.0 and P0.15, excluding P0.14
   // mask off these pins to avoid overriding other values
   FIO0MASK = ~(0b1011111111111111);
-  FIO0PIN  = ((addr & 0b1000000000000000) >> 1) | (addr & 0b11111111111111);
+  FIO0PIN  = ((addr & 0b100000000000000) << 1)
+            | (addr & 0b011111111111111);
 
   // reset mask
   FIO0MASK = 0;

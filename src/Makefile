@@ -11,7 +11,7 @@ OD		= arm-none-eabi-objdump
 RM		= rm
 
 # Tool flags
-CFLAGS  = -Wunused-parameter -I./ -I../libusb -c -W -Wall -O0 -g -DDEBUG -mcpu=arm7tdmi
+CFLAGS  = -Wno-unused-variable -I./ -I../libusb -c -W -Wall -O0 -g -DDEBUG -mcpu=arm7tdmi
 ASFLAGS = -ahls -mapcs-32 -o crt.o
 LFLAGS  =  -nostartfiles
 CPFLAGS = -O ihex
