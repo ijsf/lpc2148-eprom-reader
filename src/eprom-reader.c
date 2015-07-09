@@ -50,6 +50,10 @@ serial port.
 
 */
 
+// EPROM type selector
+#define EPROM_27256
+//#define EPROM_27128
+
 
 #include <string.h>			// memcpy
 
@@ -583,10 +587,25 @@ int main(void)
   VCOM_putchar('f');
 
   // read out eprom
-  U16 i, eprom_size = 32768; // 256 Kbit
+#if defined(EPROM_27256)
+  U16 eprom_size = 32768; // 256 Kbit
+#elif defined(EPROM_27128)
+  U16 eprom_size = 16384; // 128 Kbit
+#else
+#error "EPROM not supported"
+#endif
+  
+  U16 i;
   for(i = 0; i < eprom_size; ++i)
   {
-    U8 data = eprom_read(i);
+#if defined(EPROM_27256)
+    // 27256 series just takes 15 address lines
+    U16 addr = i;
+#elif defined(EPROM_27128)
+    // 27128 series takes 14 address lines and uses the A14 line as a PGM (program, keep high) signal
+    U16 addr = (1<<14) | i;
+#endif
+    U8 data = eprom_read(addr);
     while( VCOM_putchar(data) == EOF ); // retry until data is written to fifo
   }
 
